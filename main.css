@@ -1,0 +1,25 @@
+@charset "utf-8";
+/* CSS Document */
+#MainTitle{color:whitesmoke; background-color:black;}
+.subTitle{color:whitesmoke; background-color:gray;}
+
+/*Tab Setting*/
+.TabList{background-color: lightsalmon;}
+
+/*table Setting*/
+table{
+    width: 100%;
+    border-collapse:separate;
+    border-spacing:0;   
+}
+table th, table td{
+    padding: 15px 30px;
+    text-align: left;
+}
+table tr:first-child{
+    background-color: salmon;
+    color: black;    
+}
+table tr:nth-child(even){
+    background-color: #eee
+}

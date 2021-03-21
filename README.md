@@ -1,0 +1,3 @@
+- index.html: これをchromeで実行してください
+- main.css: css のコード
+- main.js: 主な処理はこちらに記述 
