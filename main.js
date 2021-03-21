@@ -14,7 +14,7 @@ function lower_bound(arr,num){
     return first;
 }
 
-// A期からB期までを検索した際の，配列インデックスを返す
+// startPoint期からendPoint期までを検索した際の，配列インデックスを返す
 function search_arr(arr_2dim, startPoint,endPoint){
     var searchCol = arr_2dim[0].findIndex(x => x==="期");
     var arrTmp = arr_2dim.slice(1,arr_2dim.length);
@@ -80,7 +80,6 @@ function number_error_back (startAge,endAge){
             ret_bool = true;
         }
     }
-
     return ret_bool;
 }
 
@@ -118,7 +117,6 @@ var meibo = new Vue({
                 }
                 lineArr.pop();//最終行に','が入ってしまうため
                 orig_meibo = lineArr.slice(0,lineArr.length);
-                update_meibo = lineArr.slice(0,lineArr.length);
                 delete lineArr;                
             }
         } 
@@ -129,14 +127,14 @@ var meibo = new Vue({
 var tab = new Vue({
     el: '#Tab',
     data: {
-      isActive: '1',
-      meibo_data:[],
-      ml_meibo_data:[],
+      isActive: '1',//tabの切替
+      meibo_data:[],//作業用名簿データ
+      ml_meibo_data:[],//MLデータ
       ml_meibo_dif1:["mail address"], //名簿上は登録されていることになっている (フラグがたっている) が，実際には登録されていない
       ml_meibo_dif2:["mail address"], //名簿上は登録されていない(フラグがたっていない) が，実際には登録されている
       startAge:"",
       endAge:"",
-      divSelect:"",
+      divSelect:"",//csv出力時のラジオボタン用変数
       logOutput:"",
     },
 
@@ -154,14 +152,11 @@ var tab = new Vue({
                 }                
             }
         }, 
+        
         //分割名簿の作成 タブ2
         divideMeibo (event){
             if(event && !(meibo_input_error())){
                 this.logOutput = "";
-                if (orig_meibo===""){
-                    alert("名簿情報をインポートできていません");
-                    return;
-                }
                 if(this.divSelect === "10"){
                     var searchCol = orig_meibo[0].findIndex(element=>element==="期");
                     var endAge = parseInt(orig_meibo[orig_meibo.length-1][searchCol]);
@@ -200,6 +195,7 @@ var tab = new Vue({
         },
 
         //タブ3
+        //ML名簿の読み込み
         mlCsvLoad (event){
             var load_data = event.target.files[0];
             var reader = new FileReader();
@@ -216,41 +212,47 @@ var tab = new Vue({
                 this.ml_meibo_data = lineArr;
             }    
         },
+        //照合作業をする
         mlCsvDisp(event){
-            if (this.ml_meibo_data===""){
-                alert("ML名簿情報をインポートできていません");
-            }
-            else{
-                var ml_address = [];
-                for (var tmp of this.ml_meibo_data){
-                    ml_address.push(tmp[0].trim().toLowerCase());
+            if (event && !meibo_input_error()){
+                if (this.ml_meibo_data===""){
+                    alert("ML情報をインポートできていません");
                 }
-                ml_address.shift();
-                ml_address.shift();
-                ml_address.sort();
-                ml_address_flag = new Array(ml_address.length).fill(0);
+                else{
+                    //MLからメールののみを抽出して成形
+                    var ml_address = [];
+                    for (var tmp of this.ml_meibo_data){
+                        ml_address.push(tmp[0].trim().toLowerCase());
+                    }
+                    ml_address.shift();
+                    ml_address.shift();
+                    ml_address.sort();
+                    ml_address_flag = new Array(ml_address.length).fill(0);//MLのアドレスが名簿にあったら1
 
-                var search_flag = ["ML","E-Mail 1","E-Mail 2（古い場合あり）"];
-                var searchCol = [];
-                for (var tmp of search_flag){
-                    searchCol.push(orig_meibo[0].findIndex(x => x===tmp));
-                }
-
-                for (var i=1;i<orig_meibo.length;i++){
-                    if (orig_meibo[i][searchCol[0]] == ml_flag_num){ 
-                        var index1 = ml_address.indexOf(orig_meibo[i][searchCol[1]].trim().toLowerCase());
-                        var index2 = ml_address.indexOf(orig_meibo[i][searchCol[2]].trim().toLowerCase());
-                        if(index1===-1 && index2 === -1){
-                            this.ml_meibo_dif1.push(orig_meibo[i][searchCol[1]]);
-                        }
-                        else{
-                            if (index1 !==-1) ml_address_flag[index1] = 1;
-                            if (index2 !==-1) ml_address_flag[index2] = 1;
+                    //名簿の該当箇所の配列インデックスを探す
+                    var search_flag = ["ML","E-Mail 1","E-Mail 2（古い場合あり）"];
+                    var searchCol = [];
+                    for (var tmp of search_flag){
+                        searchCol.push(orig_meibo[0].findIndex(x => x===tmp));
+                    }
+                    
+                    //照合作業
+                    for (var i=1;i<orig_meibo.length;i++){
+                        if (orig_meibo[i][searchCol[0]] == ml_flag_num){ 
+                            var index1 = ml_address.indexOf(orig_meibo[i][searchCol[1]].trim().toLowerCase());
+                            var index2 = ml_address.indexOf(orig_meibo[i][searchCol[2]].trim().toLowerCase());
+                            if(index1===-1 && index2 === -1){
+                                this.ml_meibo_dif1.push(orig_meibo[i][searchCol[1]]);
+                            }
+                            else{
+                                if (index1 !==-1) ml_address_flag[index1] = 1;
+                                if (index2 !==-1) ml_address_flag[index2] = 1;
+                            }
                         }
                     }
-                }
-                for (var i=0;i<ml_address.length;i++){
-                    if(ml_address_flag[i] !== 1) this.ml_meibo_dif2.push(ml_address[i]);
+                    for (var i=0;i<ml_address.length;i++){
+                        if(ml_address_flag[i] !== 1) this.ml_meibo_dif2.push(ml_address[i]);
+                    }
                 }
             }
         }

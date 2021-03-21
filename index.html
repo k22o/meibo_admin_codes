@@ -7,6 +7,7 @@
         <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     </head>
+
     <body>
         <div id = "Header">
             <h1 id = "MainTitle">名簿管理システム</h1>
@@ -42,6 +43,7 @@
             </div>
             <br>
 
+
             <div v-if="isActive ==='1'">
                 <h2 class = "subTitle">名簿の表示</h2>
                 <ol>
@@ -60,6 +62,7 @@
                     </tr>
                 </table>                
             </div>
+
 
             <div v-else-if="isActive ==='2'">
                 <h2 class = "subTitle">分割名簿の作成</h2>
@@ -81,6 +84,7 @@
                 <p style="white-space:pre-wrap; word-wrap:break-word;">{{ logOutput }}</p>
             </div>
 
+            
             <div v-else-if="isActive ==='3'">
                 <h2 class = "subTitle">メーリングリストとの照合</h2>
                 <ul>
