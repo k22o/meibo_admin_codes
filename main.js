@@ -239,6 +239,7 @@ var tab = new Vue({
                     //照合作業
                     for (var i=1;i<orig_meibo.length;i++){
                         if (orig_meibo[i][searchCol[0]] == ml_flag_num){ 
+                            //今の件数だと線形探索で十分だった．遅く感じたら二分探索に切り替えるべき (sortはしてある)
                             var index1 = ml_address.indexOf(orig_meibo[i][searchCol[1]].trim().toLowerCase());
                             var index2 = ml_address.indexOf(orig_meibo[i][searchCol[2]].trim().toLowerCase());
                             if(index1===-1 && index2 === -1){
