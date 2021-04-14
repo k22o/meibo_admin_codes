@@ -57,7 +57,7 @@
                 <br><br>             
                 <h2 class = "subTitle"> 出力欄 </h2>
                 <table>
-                    <tr v-for=" row in meibo_data">
+                    <tr v-for=" row in meiboData">
                       <td v-for=" column in row">{{ column }}</td>
                     </tr>
                 </table>                
@@ -106,13 +106,13 @@
                 <h2 class = "subTitle">出力欄</h2>
                 <h3> 名簿上は登録されているが，メーリスにはないアドレス一覧 </h3>
                 <table>
-                    <tr v-for=" row in ml_meibo_dif1">
+                    <tr v-for=" row in mlMeiboDif1">
                         <td> {{ row }} </td>
                     </tr>
                 </table>    
                 <h3> メーリスにはあるが名簿ではカウントされていないアドレス一覧 </h3>
                 <table>
-                    <tr v-for=" row in ml_meibo_dif2">
+                    <tr v-for=" row in mlMeiboDif2">
                         <td> {{ row }} </td>
                     </tr>
                 </table>    

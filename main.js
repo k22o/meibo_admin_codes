@@ -1,5 +1,5 @@
-var orig_meibo = "";
-var ml_flag_num = 2;
+var origMeibo = "";
+var mlFlagNum = 2;
 
 //2分探索によるインデックス探索，c++ lower_bound 参照
 function lower_bound(arr,num){
@@ -15,9 +15,9 @@ function lower_bound(arr,num){
 }
 
 // startPoint期からendPoint期までを検索した際の，配列インデックスを返す
-function search_arr(arr_2dim, startPoint,endPoint){
-    var searchCol = arr_2dim[0].findIndex(x => x==="期");
-    var arrTmp = arr_2dim.slice(1,arr_2dim.length);
+function search_arr(arrDim2, startPoint,endPoint){
+    var searchCol = arrDim2[0].findIndex(x => x==="期");
+    var arrTmp = arrDim2.slice(1,arrDim2.length);
     var searchArr = arrTmp.map(arr => arr[searchCol]); 
     var startIdx = lower_bound(searchArr,startPoint);
     var endIdx = lower_bound(searchArr,endPoint+1);
@@ -25,9 +25,9 @@ function search_arr(arr_2dim, startPoint,endPoint){
 }
 
 // 2次元配列を，csv形式として出力する
-function export_csv(arr_2dim,fileName){
+function export_csv(arrDim2,fileName){
     const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-    var data = arr_2dim.map(arr => arr.join(","));
+    var data = arrDim2.map(arr => arr.join(","));
     data = data.join("\n");
     var blob = new Blob([bom, data], { type: 'text/csv' });
     let url = (window.URL || window.webkitURL).createObjectURL(blob);
@@ -40,18 +40,18 @@ function export_csv(arr_2dim,fileName){
 }
 
 // startAgeからendAgeまでをcsvでexportする
-function meibo_exporter(data,startAge,endAge,export_name){
+function meibo_exporter(data,startAge,endAge,exportFileName){
     var startIdx,endIdx;
     [startIdx,endIdx] = search_arr(data,parseInt(startAge),parseInt(endAge));
-    var export_data = orig_meibo.slice(startIdx,endIdx);            
-    export_data.unshift(orig_meibo[0]);
-    export_csv(export_data,export_name);
+    var exportData = origMeibo.slice(startIdx,endIdx);            
+    exportData.unshift(origMeibo[0]);
+    export_csv(exportData,exportFileName);
     var addLog = startAge + "期 から " + endAge + "期 までをエクスポートしました\n";
     return addLog;
 }
 
 // A期からB期まで，で一方にしか入力がなければ，A=Bとする
-function oneSide_number(startAge,endAge){
+function one_side_number(startAge,endAge){
     if (startAge === "" && endAge !== ""){
         startAge = endAge;
     }
@@ -63,7 +63,7 @@ function oneSide_number(startAge,endAge){
 
 // 数値の入力が正しいか判定する
 function number_error_back (startAge,endAge){
-    var ret_bool = false;
+    var returnBool = false;
     if (isNaN(startAge) || isNaN(endAge)){
         alert("半角数字で入力してください")
     }
@@ -77,16 +77,16 @@ function number_error_back (startAge,endAge){
             alert("入力の値は昇順にしてください");
         }                
         else{
-            ret_bool = true;
+            returnBool = true;
         }
     }
-    return ret_bool;
+    return returnBool;
 }
 
 //名簿をimportしたかチェックする
 function meibo_input_error(){
-    if(orig_meibo===""){alert("名簿情報をインポートできていません");}
-    return orig_meibo==="";
+    if(origMeibo===""){alert("名簿情報をインポートできていません");}
+    return origMeibo==="";
 }
 
 //名簿のロード
@@ -97,26 +97,26 @@ var meibo = new Vue({
     },
     methods:{
         csv_load: function(event){
-            var original_data = event.target.files[0];
+            var firstLoadData = event.target.files[0];
             var reader = new FileReader();
-            reader.readAsText(original_data,'shift-jis');
+            reader.readAsText(firstLoadData,'shift-jis');
             reader.onload = () => {
                 var lines = reader.result.split("\n");
                 var lineArr = [];
 
-                var append_cnt = 0;
+                var appendCnt = 0;
                 for (var i=0;i<lines.length;i++){
-                    var tmp_line = lines[i].split(",");
-                    if (tmp_line[2] === ""){//期
+                    var tmpLine = lines[i].split(",");
+                    if (tmpLine[2] === ""){//期
                         continue; //空の行の削除
                     }
                     else{
-                        lineArr[append_cnt] = lines[i].split(",");
-                        append_cnt ++;
+                        lineArr[appendCnt] = lines[i].split(",");
+                        appendCnt ++;
                     }
                 }
                 lineArr.pop();//最終行に','が入ってしまうため
-                orig_meibo = lineArr.slice(0,lineArr.length);
+                origMeibo = lineArr.slice(0,lineArr.length);
                 delete lineArr;                
             }
         } 
@@ -128,10 +128,10 @@ var tab = new Vue({
     el: '#Tab',
     data: {
       isActive: '1',//tabの切替
-      meibo_data:[],//作業用名簿データ
-      ml_meibo_data:[],//MLデータ
-      ml_meibo_dif1:["mail address"], //名簿上は登録されていることになっている (フラグがたっている) が，実際には登録されていない
-      ml_meibo_dif2:["mail address"], //名簿上は登録されていない(フラグがたっていない) が，実際には登録されている
+      meiboData:[],//作業用名簿データ
+      mlMeiboData:[],//MLデータ
+      mlMeiboDif1:["mail address"], //名簿上は登録されていることになっている (フラグがたっている) が，実際には登録されていない
+      mlMeiboDif2:["mail address"], //名簿上は登録されていない(フラグがたっていない) が，実際には登録されている
       startAge:"",
       endAge:"",
       divSelect:"",//csv出力時のラジオボタン用変数
@@ -142,13 +142,13 @@ var tab = new Vue({
         //名簿の表示 タブ１ 適切な範囲を名簿から切り出す
         dispMeibo (event){
             if(event && !(meibo_input_error())){
-                [this.startAge,this.endAge] = oneSide_number(this.startAge,this.endAge);
+                [this.startAge,this.endAge] = one_side_number(this.startAge,this.endAge);
                 if (number_error_back(this.startAge,this.endAge)){
                     var startIdx,endIdx;
-                    var tmp = orig_meibo.slice(0,orig_meibo.length);
+                    var tmp = origMeibo.slice(0,origMeibo.length);
                     [startIdx,endIdx] = search_arr(tmp,parseInt(this.startAge),parseInt(this.endAge));
-                    this.meibo_data = orig_meibo.slice(startIdx,endIdx);            
-                    this.meibo_data.unshift(orig_meibo[0]);
+                    this.meiboData = origMeibo.slice(startIdx,endIdx);            
+                    this.meiboData.unshift(origMeibo[0]);
                 }                
             }
         }, 
@@ -158,30 +158,30 @@ var tab = new Vue({
             if(event && !(meibo_input_error())){
                 this.logOutput = "";
                 if(this.divSelect === "10"){
-                    var searchCol = orig_meibo[0].findIndex(element=>element==="期");
-                    var endAge = parseInt(orig_meibo[orig_meibo.length-1][searchCol]);
+                    var searchCol = origMeibo[0].findIndex(element=>element==="期");
+                    var endAge = parseInt(origMeibo[origMeibo.length-1][searchCol]);
                     for (var i=0;i<=parseInt(endAge/10);i++){
-                        var tmp = orig_meibo.slice(0,orig_meibo.length);
-                        var export_name = 'meibo_div_' + (10*i+1) + 'to' + 10*(i+1) + '.csv';
-                        var addLog = meibo_exporter(tmp,10*i+1,10*(i+1),export_name);
+                        var tmp = origMeibo.slice(0,origMeibo.length);
+                        var exportFileName = 'meibo_div_' + (10*i+1) + 'to' + 10*(i+1) + '.csv';
+                        var addLog = meibo_exporter(tmp,10*i+1,10*(i+1),exportFileName);
                         this.logOutput = this.logOutput + addLog;                        
                     }       
                 }
                 else if(this.divSelect === "custom"){
-                    var tmp = orig_meibo.slice(0,orig_meibo.length);
-                    [this.startAge,this.endAge] = oneSide_number(this.startAge,this.endAge);    
+                    var tmp = origMeibo.slice(0,origMeibo.length);
+                    [this.startAge,this.endAge] = one_side_number(this.startAge,this.endAge);    
                     if (number_error_back(this.startAge,this.endAge)){
-                        var export_name = 'meibo_div_' + this.startAge + 'to' + this.endAge + '.csv';
-                        this.logOutput = meibo_exporter(tmp,this.startAge,this.endAge,export_name);
+                        var exportFileName = 'meibo_div_' + this.startAge + 'to' + this.endAge + '.csv';
+                        this.logOutput = meibo_exporter(tmp,this.startAge,this.endAge,exportFileName);
                     }
                 }
                 else if(this.divSelect === "custom_each"){
-                    [this.startAge,this.endAge] = oneSide_number(this.startAge,this.endAge);    
+                    [this.startAge,this.endAge] = one_side_number(this.startAge,this.endAge);    
                     if (number_error_back(this.startAge,this.endAge)){
                         for (var i=this.startAge;i<=this.endAge;i++){
-                            var export_name = 'meibo_div_' + i + 'to' + i + '.csv';
-                            var tmp = orig_meibo.slice(0,orig_meibo.length);
-                            var addLog = meibo_exporter(tmp,i,i,export_name);
+                            var exportFileName = 'meibo_div_' + i + 'to' + i + '.csv';
+                            var tmp = origMeibo.slice(0,origMeibo.length);
+                            var addLog = meibo_exporter(tmp,i,i,exportFileName);
                             this.logOutput = this.logOutput + addLog;                            
                         }
                     }
@@ -197,62 +197,62 @@ var tab = new Vue({
         //タブ3
         //ML名簿の読み込み
         mlCsvLoad (event){
-            var load_data = event.target.files[0];
+            var loadingData = event.target.files[0];
             var reader = new FileReader();
-            reader.readAsText(load_data,'UTF-8');
+            reader.readAsText(loadingData,'UTF-8');
             reader.onload = () => {
                 var lines = reader.result.split("\n");
                 var lineArr = [];
-                var append_cnt = 0;
+                var appendCnt = 0;
                 for (var i=1;i<lines.length;i++){
-                    lineArr[append_cnt] = lines[i].split(",");
-                    append_cnt ++;
+                    lineArr[appendCnt] = lines[i].split(",");
+                    appendCnt ++;
                 }
                 lineArr.unshift(lines[0].split(","));
-                this.ml_meibo_data = lineArr;
+                this.mlMeiboData = lineArr;
             }    
         },
         //照合作業をする
         mlCsvDisp(event){
             if (event && !meibo_input_error()){
-                if (this.ml_meibo_data===""){
+                if (this.mlMeiboData===""){
                     alert("ML情報をインポートできていません");
                 }
                 else{
                     //MLからメールののみを抽出して成形
-                    var ml_address = [];
-                    for (var tmp of this.ml_meibo_data){
-                        ml_address.push(tmp[0].trim().toLowerCase());
+                    var mlAddress = [];
+                    for (var tmp of this.mlMeiboData){
+                        mlAddress.push(tmp[0].trim().toLowerCase());
                     }
-                    ml_address.shift();
-                    ml_address.shift();
-                    ml_address.sort();
-                    ml_address_flag = new Array(ml_address.length).fill(0);//MLのアドレスが名簿にあったら1
+                    mlAddress.shift();
+                    mlAddress.shift();
+                    mlAddress.sort();
+                    mlAddressFlag = new Array(mlAddress.length).fill(0);//MLのアドレスが名簿にあったら1
 
                     //名簿の該当箇所の配列インデックスを探す
-                    var search_flag = ["ML","E-Mail 1","E-Mail 2（古い場合あり）"];
+                    var searchFlagArr = ["ML","E-Mail 1","E-Mail 2（古い場合あり）"];
                     var searchCol = [];
-                    for (var tmp of search_flag){
-                        searchCol.push(orig_meibo[0].findIndex(x => x===tmp));
+                    for (var tmp of searchFlagArr){
+                        searchCol.push(origMeibo[0].findIndex(x => x===tmp));
                     }
                     
                     //照合作業
-                    for (var i=1;i<orig_meibo.length;i++){
-                        if (orig_meibo[i][searchCol[0]] == ml_flag_num){ 
+                    for (var i=1;i<origMeibo.length;i++){
+                        if (origMeibo[i][searchCol[0]] == mlFlagNum){ 
                             //今の件数だと線形探索で十分だった．遅く感じたら二分探索に切り替えるべき (sortはしてある)
-                            var index1 = ml_address.indexOf(orig_meibo[i][searchCol[1]].trim().toLowerCase());
-                            var index2 = ml_address.indexOf(orig_meibo[i][searchCol[2]].trim().toLowerCase());
+                            var index1 = mlAddress.indexOf(origMeibo[i][searchCol[1]].trim().toLowerCase());
+                            var index2 = mlAddress.indexOf(origMeibo[i][searchCol[2]].trim().toLowerCase());
                             if(index1===-1 && index2 === -1){
-                                this.ml_meibo_dif1.push(orig_meibo[i][searchCol[1]]);
+                                this.mlMeiboDif1.push(origMeibo[i][searchCol[1]]);
                             }
                             else{
-                                if (index1 !==-1) ml_address_flag[index1] = 1;
-                                if (index2 !==-1) ml_address_flag[index2] = 1;
+                                if (index1 !==-1) mlAddressFlag[index1] = 1;
+                                if (index2 !==-1) mlAddressFlag[index2] = 1;
                             }
                         }
                     }
-                    for (var i=0;i<ml_address.length;i++){
-                        if(ml_address_flag[i] !== 1) this.ml_meibo_dif2.push(ml_address[i]);
+                    for (var i=0;i<mlAddress.length;i++){
+                        if(mlAddressFlag[i] !== 1) this.mlMeiboDif2.push(mlAddress[i]);
                     }
                 }
             }
