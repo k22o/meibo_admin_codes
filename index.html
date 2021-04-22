@@ -51,7 +51,7 @@
                     <li>displayボタンを押してください</li>
                 </ol>
                 <input type="text" v-model="startAge" class ="meiboDispInput" size=3> 期から
-                <input type="text" v-model="endAge" class ="meiboDispInput" size=3>期まで<br>
+                <input type="text" v-model="lastAge" class ="meiboDispInput" size=3>期まで<br>
                 <br>
                 <button @click="dispMeibo" class ="meiboDispInput"> display </button>
                 <br><br>             
@@ -76,7 +76,7 @@
                 <input type="radio" v-model="divSelect" value ="custom">(b) 特定の範囲を纏めて出力<br>
                 <input type="radio" v-model="divSelect" value ="custom_each">(c) 特定の範囲を1期ごとに出力<br>
                 <input type="text" v-model = "startAge" size = 3> 期から
-                <input type="text" v-model = "endAge"  size = 3>期まで<br>
+                <input type="text" v-model = "lastAge"  size = 3>期まで<br>
                 <br><br>
                 <button @click="divideMeibo" class = "meiboDivSubmit"> export </button>
                 <br><br>
@@ -88,7 +88,7 @@
             <div v-else-if="isActive ==='3'">
                 <h2 class = "subTitle">メーリングリストとの照合</h2>
                 <ul>
-                    <li>名簿上にあるメーリングリストのフラグを変更した場合は，main.jsの変数 "ml_flag_num "を書き換えてください．
+                    <li>名簿上にあるメーリングリストのフラグを変更した場合は，main.jsの変数 "mlFlagNum "を書き換えてください．
                         2021.3現在，フラグは2となっています．</li>
                     <li>メールアドレスの大文字小文字は区別していません (Google Groupがそのような仕様だと思われます)． </li>
                     <li>Google Gorupのバグなのか，メールアカウント中のドット"."が消えた形で登録されていることがあります．</li>    
