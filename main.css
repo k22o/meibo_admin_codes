@@ -4,10 +4,18 @@
 #MainTitle{color:whitesmoke; background-color:black;}
 .subTitle{color:whitesmoke; background-color:gray;}
 
+#contentbox{
+    box-sizing: boarder-box;
+    width: 90%;
+    margin: 5%;
+    padding: 10px;
+}
+
 /*Tab Setting*/
-.TabList{background-color: lightsalmon;}
+.TabList{background-color: lightgray;}
 
 /*table Setting*/
+/*
 table{
     width: 100%;
     border-collapse:separate;
@@ -18,9 +26,10 @@ table th, table td{
     text-align: left;
 }
 table tr:first-child{
-    background-color: salmon;
+    background-color: lightgray;
     color: black;    
 }
 table tr:nth-child(even){
     background-color: #eee
 }
+*/

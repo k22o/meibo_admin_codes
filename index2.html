@@ -4,19 +4,19 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Meibo</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">        <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     </head>
 
     <body>
-        <div id="contentbox">        
+        <div id="contentbox">
             <div id = "Header">
                 <h1 id = "MainTitle">名簿管理システム</h1>
                 <h2>実行環境</h2>
                 <ul>
                     <li>インターネット接続可能な環境で使用してください．</li>
                     <li>動作確認はGoogle Chromeでしか行っていません．他のブラウザでの動作は保証しかねます．</li>
-                    <li>名簿のラベル (第1列) の名称を変更した場合，一部動作しない可能性があります．main.jsを修正してください．
+                    <li>名簿のラベル (第1行) の名称を変更した場合，一部動作しない可能性があります．main.jsを修正してください．
                         "期", "E-Mail 1"など，ダブルクォーテーションで囲まれた部分を探してください．</li>
                 </ul>
 
@@ -26,24 +26,29 @@
                     <li>ラジオボタンから行う作業を選び，その後の画面の指示に従ってください</li>
                 </ol>
 
-                <input type = "file" @change = "csv_load" accept=".csv">
-                </p>
+                <form>
+                    <div class="form-group">
+                      <input type="file" class="form-control-file" id="inputMeibo" @change = "csv_load" accept=".csv">
+                    </div>
+                </form> 
             </div>
 
             <div id = "Tab">
                 <div class = "TabList">
-                    <input type="radio" value="1" id="Tab1" class="TabRadio" v-model="isActive">
-                    <label for="Tab1" class="TabLabel">名簿の表示</label>
-                    <br>
-                    <input type="radio" value="2" id="Tab2" class="TabRadio" v-model="isActive">
-                    <label for="Tab2" class="TabLabel">分割名簿の作成</label>
-                    <br>
-                    <input type="radio" value="3" id="Tab3" class="TabRadio" v-model="isActive">
-                    <label for="Tab3" class="TabLabel">メーリングリストとの照合</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="Tab1" value="1" v-model="isActive">
+                        <label class="form-check-label" for="Tab1">名簿の表示</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="Tab2" value="2" v-model="isActive">
+                        <label class="form-check-label" for="Tab2">分割名簿の作成</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="Tab3" value="3" v-model="isActive">
+                        <label class="form-check-label" for="Tab3">メーリングリストとの照合</label>
+                    </div>
                 </div>
-                <br>
-
-
+                <hr>
                 <div v-if="isActive ==='1'">
                     <h2 class = "subTitle">名簿の表示</h2>
                     <ol>
@@ -53,16 +58,16 @@
                     <input type="text" v-model="startAge" class ="meiboDispInput" size=3> 期から
                     <input type="text" v-model="lastAge" class ="meiboDispInput" size=3>期まで<br>
                     <br>
-                    <button @click="dispMeibo" class ="meiboDispInput"> display </button>
-                    <br><br>             
+                    <button @click="dispMeibo" class="btn btn-primary btn-sm"> display </button>
+                    <br>        
+                    <hr>  
                     <h2 class = "subTitle"> 出力欄 </h2>
-                    <table>
+                    <table class = "table table-striped">
                         <tr v-for=" row in meiboData">
                         <td v-for=" column in row">{{ column }}</td>
                         </tr>
                     </table>                
                 </div>
-
 
                 <div v-else-if="isActive ==='2'">
                     <h2 class = "subTitle">分割名簿の作成</h2>
@@ -72,14 +77,26 @@
                         <li>1箇所のみの記入で，その代のみを選択したことになります</li>
                         <li>exportボタンを押すと，csv形式で出力されます</li>
                     </ol>
-                    <input type="radio" v-model="divSelect" value ="10">(a) 全範囲を10期ごとに出力<br>
-                    <input type="radio" v-model="divSelect" value ="custom">(b) 特定の範囲を纏めて出力<br>
-                    <input type="radio" v-model="divSelect" value ="custom_each">(c) 特定の範囲を1期ごとに出力<br>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="selct1" value="10" v-model="divSelect">
+                        <label class="form-check-label" for="select1">(a) 全範囲を10期ごとに出力</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="select2" value="custom" v-model="divSelect">
+                        <label class="form-check-label" for="select2">(b) 特定の範囲を纏めて出力/label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="Tab3" value="custom_each" v-model="divSelect">
+                        <label class="form-check-label" for="select3">(c) 特定の範囲を1期ごとに出力</label>
+                    </div>
+
                     <input type="text" v-model = "startAge" size = 3> 期から
                     <input type="text" v-model = "lastAge"  size = 3>期まで<br>
-                    <br><br>
-                    <button @click="divideMeibo" class = "meiboDivSubmit"> export </button>
-                    <br><br>
+                    <br>
+                    <button @click="divideMeibo" class="btn btn-primary btn-sm"> export </button>
+                    <br>
+                    <hr>  
                     <h2 class = "subTitle"> ログ </h2>
                     <p style="white-space:pre-wrap; word-wrap:break-word;">{{ logOutput }}</p>
                 </div>
@@ -98,18 +115,25 @@
                         <li>ダウンロードしたファイルを下記ボタンからアップしてください</li>
                         <li>displayボタンを押してください</li>
                     </ol>
-                    <input type = "file" @change = "mlCsvLoad" accept=".csv"><br>
-                    <button @click="mlCsvDisp" class = "mlCsvDisp"> Display </button>
-
+                    <form>
+                        <div class="form-group">
+                          <input type="file" class="form-control-file" id="inputMlMeibo" @change = "mlCsvLoad" accept=".csv">
+                        </div>
+                    </form>     
+                    <br>
+                    <button @click="mlCsvDisp" class="btn btn-primary btn-sm"> Display </button> 
+                    <br>
+                    <hr>
                     <h2 class = "subTitle">出力欄</h2>
-                    <h3> 名簿上は登録されているが，メーリスにはないアドレス一覧 </h3>
-                    <table>
+                    <h4> 名簿上は登録されているが，メーリスにはないアドレス一覧 </h4>
+                    <table class = "table table-striped">
                         <tr v-for=" row in mlMeiboDif1">
                             <td> {{ row }} </td>
                         </tr>
                     </table>    
-                    <h3> メーリスにはあるが名簿ではカウントされていないアドレス一覧 </h3>
-                    <table>
+                    <br>
+                    <h4> メーリスにはあるが名簿ではカウントされていないアドレス一覧 </h4>
+                    <table class = "table table-striped">
                         <tr v-for=" row in mlMeiboDif2">
                             <td> {{ row }} </td>
                         </tr>
@@ -117,7 +141,8 @@
                 </div>
             </div>
         </div>
-    </body>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>    </body>
 </html>
 
 <script type="text/javascript" src="main.js"></script>        
